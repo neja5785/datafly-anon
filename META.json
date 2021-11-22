@@ -1,0 +1,31 @@
+{
+   "name": "datafly_anon",
+   "abstract": "Datafly anonymizer",
+   "version": "1.0.0",
+   "maintainer": "Nedas Jankauskas <nedasj44@gmail.com>",
+   "license": "postgresql",
+   "prereqs": {
+      "runtime": {
+         "requires": {
+            "PostgreSQL": "12.9.0"
+         }
+      }
+   },
+   "provides": {
+      "datafly_anon": {
+	 "abstract":"Datafly anonymizer"
+         "file": "sql/datafly_anon--1.0.sql",
+         "version": "1.0.0"
+      }
+   },
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "https://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+      "anonymization",
+      "gdpr"
+   ]
+}
+
+
