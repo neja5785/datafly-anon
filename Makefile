@@ -1,8 +1,6 @@
 EXTENSION = datafly_anon
-EXTVERSION   = 3.0
-DISTVERSION  = 0.3.0
 
-DATA = sql/datafly_anon--1.2.sql
+DATA = sql/datafly_anon--1.3.sql
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
