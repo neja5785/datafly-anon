@@ -175,7 +175,7 @@ LANGUAGE plpgsql STRICT
 	$$;
 	
 
-CREATE OR REPLACE FUNCTION add_level_generalization(schema_name varchar, attribute_name varchar,table_name varchar,generalization_rule varchar, new_level integer,current_function varchar, target_sch_name varchar, target_tbl_name varchar)
+CREATE OR REPLACE FUNCTION add_level_generalization(schema_name varchar, attribute_name varchar,tbl_name varchar,generalization_rule varchar, new_level integer,current_function varchar, target_sch_name varchar, target_tbl_name varchar)
 RETURNS void
 LANGUAGE plpgsql STRICT
 	AS $$  
@@ -205,12 +205,12 @@ LANGUAGE plpgsql STRICT
 		 IF (SELECT EXISTS
 			 	(SELECT 1 from vgh where attr=attribute_name) IS FALSE) THEN
 		 	EXECUTE 'INSERT INTO VGH(lvl,sch_name,tbl,target_sch_name, target_tbl_name, attr, generalization_rule, is_active,current_function)
-						VALUES (0,'''||schema_name||''','''|| table_name ||''','''||target_sch_name||''','''||target_tbl_name||''','''|| attribute_name ||''',NULL,TRUE,'''||table_name ||'.'||attribute_name||''')'
-						USING attribute_name,table_name, schema_name;
+						VALUES (0,'''||schema_name||''','''|| tbl_name ||''','''||target_sch_name||''','''||target_tbl_name||''','''|| attribute_name ||''',NULL,TRUE,'''||tbl_name ||'.'||attribute_name||''')'
+						USING attribute_name,tbl_name, schema_name;
 		 END IF;
 		 EXECUTE 'INSERT INTO VGH(lvl,sch_name,tbl,target_sch_name, target_tbl_name, attr,generalization_rule,is_active,current_function) 
 		 		  VALUES ($1,$6,$5,$7,$8, $2, $3, FALSE,$4)'
-				  USING new_level, attribute_name, generalization_rule,current_function,table_name,schema_name, target_sch_name, target_tbl_name;
+				  USING new_level, attribute_name, generalization_rule,current_function,tbl_name,schema_name, target_sch_name, target_tbl_name;
 		 END;
 	$$;
 CREATE OR REPLACE FUNCTION check_if_level_for_function_already_exists(attribute_name varchar, table_name varchar, current_function varchar, new_level integer)
