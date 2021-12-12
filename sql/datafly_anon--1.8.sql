@@ -503,7 +503,7 @@ LANGUAGE plpgsql STRICT
 				IF (quasi_identifiers_info->>'attrName' is null or quasi_identifiers_generalization->counter->>'generalizationRule' is null or quasi_identifiers_generalization->counter->>'level' is null or quasi_identifiers_generalization->counter->>'generalizationFunction' is null or quasi_identifiers_generalization->counter->>'generalizationFunction' not in ('generalize_numrange', 'generalize_daterange') ) then
 					RAISE EXCEPTION 'Json is not set correctly';
 				END IF;
-				perform add_level_generalization(sch_name,quasi_identifiers_info->>'attrName'::VARCHAR,tbl_name, quasi_identifiers_generalization->counter->>'generalizationRule'::VARCHAR, CAST(quasi_identifiers_generalization->counter->>'level' AS INTEGER), quasi_identifiers_generalization->counter->>'generalizationFunction'::VARCHAR,target_sch_name,target_tbl_name);		
+				perform add_level_generalization(sch_name,quasi_identifiers_info->>'attrName'::VARCHAR,tbl_name, quasi_identifiers_generalization->counter->>'generalizationRule'::VARCHAR, CAST(quasi_identifiers_generalization->counter->>'level' AS INTEGER), quasi_identifiers_generalization->counter->>'generalizationFunction'::VARCHAR,target_sch_name,target_tbl_name, false);		
 				end loop;
 		end loop;
 		END;
