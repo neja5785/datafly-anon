@@ -1,7 +1,7 @@
 {
    "name": "datafly_anon",
    "abstract": "Datafly anonymizer",
-   "version": "1.0.11",
+   "version": "1.0.12",
    "maintainer": "Nedas Jankauskas <nedasj44@gmail.com>",
    "license": "postgresql",
    "prereqs": {
@@ -14,8 +14,8 @@
    "provides": {
       "datafly_anon": {
 	 "abstract":"Datafly anonymizer",
-         "file": "sql/datafly_anon--1.6.sql",
-         "version": "1.0.8"
+         "file": "sql/datafly_anon--1.7.sql",
+         "version": "1.0.9"
       }
    },
   "resources": {

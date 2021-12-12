@@ -14,6 +14,8 @@ LANGUAGE plpgsql STRICT
 				attribute_with_most_distinct_values:=qi_attributes[counter];
 			end if;		
 		end loop;
+		test :=(select count(*) from (select ugis,svoris,t_data,g_data,kmi,count(*) ab from secured.patients_information_anon group by 1,2,3,4,5 having count(*)<4)abb);
+		raise notice 'ziurek cia %', test;
 		return attribute_with_most_distinct_values;
 		END;
 	$$;
@@ -33,7 +35,7 @@ LANGUAGE plpgsql STRICT
 					group by '|| qi ||')sub'
 			INTO k_param
 			USING qi, target_schema_name, target_table_name;
- 	 		raise notice '%',k_param;
+ 	 		raise notice '% par',k_param;
 		return k_param;
 		END;
   	$$;  
@@ -262,6 +264,7 @@ LANGUAGE plpgsql STRICT
 		final_function_with_parameters := generalization_function ||
 								   '('||tbl_name||'.'||attribute_name || caster ||', '''||generalize_rule ||''') AS '||attribute_name;	
 		view_definition := REPLACE (view_definition, previous_function_definition,final_function_with_parameters);	
+		raise notice '%',view_definition;
 		EXECUTE 'DROP VIEW '|| target_sch_name||'.'||target_view;
 		EXECUTE 'CREATE VIEW '|| target_sch_name||'.'||target_view||' AS' || view_definition::TEXT;
 		END;
@@ -470,8 +473,7 @@ LANGUAGE plpgsql STRICT
 				table_name varchar,
 				target_schema_name varchar,
 				target_view_name varchar,
-				k_param integer,
-				PRIMARY KEY (schema_name,table_name, target_schema_name, target_view_name))';
+				k_param integer)';
 		END IF;	
 		IF(does_table_exist(sch_name,'generalization_config') IS FALSE) THEN 	
 			 EXECUTE 'create table '|| sch_name ||'.generalization_config 
