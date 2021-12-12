@@ -5,7 +5,6 @@ LANGUAGE plpgsql STRICT
 		DECLARE 
 		attribute_with_most_distinct_values varchar;
 		temp_num integer;
-		test integer;
 		BEGIN 
 		temp_num:=0;
 		for counter in 1..array_length(qi_attributes,1) loop
@@ -14,8 +13,6 @@ LANGUAGE plpgsql STRICT
 				attribute_with_most_distinct_values:=qi_attributes[counter];
 			end if;		
 		end loop;
-		test :=(select count(*) from (select ugis,svoris,t_data,g_data,kmi,count(*) ab from secured.patients_information_anon group by 1,2,3,4,5 having count(*)<4)abb);
-		raise notice 'ziurek cia %', test;
 		return attribute_with_most_distinct_values;
 		END;
 	$$;
@@ -35,7 +32,6 @@ LANGUAGE plpgsql STRICT
 					group by '|| qi ||')sub'
 			INTO k_param
 			USING qi, target_schema_name, target_table_name;
- 	 		raise notice '% par',k_param;
 		return k_param;
 		END;
   	$$;  
@@ -48,7 +44,6 @@ LANGUAGE plpgsql STRICT
 		BEGIN
 		EXECUTE 'SELECT COUNT(DISTINCT ' || attribute_name ||') FROM '||target_schema_name||'.'||target_table_name INTO distinct_count
 		USING distinct_count;
-		raise notice '% %', attribute_name, distinct_count; 
 		RETURN distinct_count;	
 		END;
 	$$;
@@ -70,13 +65,11 @@ language plpgsql
 		END IF;							   
 		qi_attributes:= array (select distinct attr FROM generalization_config gc INNER JOIN anonymized_tables an ON gc.original_and_anonymized_objects_id=an.id
 							   where table_name = tbl_name and schema_name=sch_name and target_view_name=target_view and target_schema_name=target_sch_name);
-		raise notice '%',qi_attributes;
 		FOR	counter IN 1..array_length(qi_attributes,1) LOOP
 			PERFORM does_column_exist_in_table(qi_attributes[counter],sch_name, tbl_name);
 		END LOOP;
 		target_view:= generate_init_view( sch_name , tbl_name, target_sch_name,target_view, test_mode, is_triggered);
 		counter:=return_k_parameter_from_current_dataset(qi_attributes, target_sch_name, target_view);	
-		raise notice '%', k;
  		WHILE counter<k LOOP
 			  PERFORM generalize(return_attribute_with_most_distinct_values(qi_attributes, target_sch_name, target_view),target_sch_name,target_view, sch_name, tbl_name);
 			  counter:=return_k_parameter_from_current_dataset(qi_attributes, target_sch_name, target_view);
@@ -201,7 +194,6 @@ language plpgsql
 				INTO generalization_rule,new_level;
 			RAISE WARNING 'Column ''%'' is being generalized with rule %',
                     attribute_name, generalization_rule;
-			raise notice '%',target_view;
 			IF new_level IS NULL THEN
 				RAISE EXCEPTION 'Not enough generalization levels for column ''%'' % % % % % % ',
 						attribute_name, generalization_rule, new_level, target_sch_name , target_view , sch_name , tbl_name  ;
@@ -264,7 +256,6 @@ LANGUAGE plpgsql STRICT
 		final_function_with_parameters := generalization_function ||
 								   '('||tbl_name||'.'||attribute_name || caster ||', '''||generalize_rule ||''') AS '||attribute_name;	
 		view_definition := REPLACE (view_definition, previous_function_definition,final_function_with_parameters);	
-		raise notice '%',view_definition;
 		EXECUTE 'DROP VIEW '|| target_sch_name||'.'||target_view;
 		EXECUTE 'CREATE VIEW '|| target_sch_name||'.'||target_view||' AS' || view_definition::TEXT;
 		END;
@@ -503,13 +494,12 @@ LANGUAGE plpgsql STRICT
 				IF (quasi_identifiers_info->>'attrName' is null or quasi_identifiers_generalization->counter->>'generalizationRule' is null or quasi_identifiers_generalization->counter->>'level' is null or quasi_identifiers_generalization->counter->>'generalizationFunction' is null or quasi_identifiers_generalization->counter->>'generalizationFunction' not in ('generalize_numrange', 'generalize_daterange') ) then
 					RAISE EXCEPTION 'Json is not set correctly';
 				END IF;
-				perform add_level_generalization(sch_name,quasi_identifiers_info->>'attrName'::VARCHAR,tbl_name, quasi_identifiers_generalization->counter->>'generalizationRule'::VARCHAR, CAST(quasi_identifiers_generalization->counter->>'level' AS INTEGER), quasi_identifiers_generalization->counter->>'generalizationFunction'::VARCHAR,target_sch_name,target_tbl_name, false);		
+				perform add_level_generalization(sch_name,quasi_identifiers_info->>'attrName'::VARCHAR,tbl_name, quasi_identifiers_generalization->counter->>'generalizationRule'::VARCHAR, CAST(quasi_identifiers_generalization->counter->>'level' AS INTEGER), quasi_identifiers_generalization->counter->>'generalizationFunction'::VARCHAR,target_sch_name,target_tbl_name,false);		
 				end loop;
 		end loop;
 		END;
 	$$;
-
-	CREATE OR REPLACE FUNCTION generalize_numrange(
+CREATE OR REPLACE FUNCTION generalize_numrange(
   val NUMERIC,
   step VARCHAR 
 )
