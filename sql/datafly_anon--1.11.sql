@@ -492,3 +492,36 @@ LANGUAGE plpgsql STRICT
 		end loop;
 		END;
 	$$;
+	CREATE OR REPLACE FUNCTION generalize_numrange(
+  val NUMERIC,
+  step VARCHAR 
+)
+RETURNS NUMRANGE
+AS $$
+WITH i AS (
+  SELECT int4range(
+    val::INTEGER / step::INTEGER * step::INTEGER,
+    ((val::INTEGER / step::INTEGER)+1) * step::INTEGER
+  ) as r
+)
+SELECT numrange(
+    lower(i.r)::NUMERIC,
+    upper(i.r)::NUMERIC
+  )
+FROM i
+;
+$$
+LANGUAGE SQL IMMUTABLE SECURITY INVOKER;
+
+CREATE OR REPLACE FUNCTION generalize_daterange(
+  val DATE,
+  step TEXT DEFAULT 'decade'
+)
+RETURNS DATERANGE
+AS $$
+SELECT daterange(
+    date_trunc(step, val)::DATE,
+    (date_trunc(step, val) + ('1 '|| step)::INTERVAL)::DATE
+  );
+$$
+LANGUAGE SQL IMMUTABLE SECURITY INVOKER;
