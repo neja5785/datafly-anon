@@ -1,4 +1,4 @@
 comment = 'A semantic version data type'
-default_version = '1.9'
+default_version = '1.10'
 module_pathname = '$libdir/datafly_anon'
 relocatable = true
